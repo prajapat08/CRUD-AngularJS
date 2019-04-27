@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>CRUD</title>  
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>  
+</head>  
+<body>  
+<div class="col-md-12">
+    <h3 align="center">CRUD</h3>
+    <div ng-app="sa_app" ng-controller="controller" ng-init="show()">
+        <div class="col-md-6">
+            <label>Name</label>
+            <input type="text" name="name" ng-model="name" class="form-control">
+            <br/>
+            <label>Email</label>
+            <input type="text" name="email" ng-model="email" class="form-control">
+            <br/>
+            <label>Age</label>
+            <input type="text" name="age" ng-model="age" class="form-control">
+            <br/>
+            <input type="hidden" ng-model="id">
+            <input type="submit" name="insert" class="btn btn-primary" ng-click="insert()" value="{{btnName}}">
+        </div>
+        <div class="col-md-6">
+            <table class="table table-bordered">
+                <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+                <tr ng-repeat="x in names">
+                    <td>{{x.id}}</td>
+                    <td>{{x.name}}</td>
+                    <td>{{x.email}}</td>
+                    <td>{{x.age}}</td>
+                    <td>
+                        <button  ng-click="upd(x.id, x.name, x.email, x.age)">
+                             Edit
+                        </button>
+                    </td>
+                    <td>
+                        <button  ng-click="dele(x.id )">
+                              Delete
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<script>  
+var app = angular.module("sa_app", []);
+app.controller("controller", function($scope, $http) {
+    $scope.btnName = "Insert";
+    $scope.insert = function() {
+        if ($scope.name == null) {
+            alert("Enter Your Name");
+        } else if ($scope.email == null) {
+            alert("Enter Your Email ID");
+        } else if ($scope.age == null) {
+            alert("Enter Your Age");
+        } else {
+            $http.post(
+                "addup.php", {
+                    'name': $scope.name,
+                    'email': $scope.email,
+                    'age': $scope.age,
+                    'btnName': $scope.btnName,
+                    'id': $scope.id
+                }
+            ).success(function(data) {
+                alert(data);
+                $scope.name = null;
+                $scope.email = null;
+                $scope.age = null;
+                $scope.btnName = "Insert";
+                $scope.show();
+            });
+        }
+    }
+    $scope.dele = function(id) {
+         
+            $http.post("delete.php", {
+                    'id': id
+                })
+                .success(function(data) {
+                    alert(data);
+                    $scope.show();
+                });
+         
+    }
+    $scope.show = function() {
+        $http.get("get.php")
+            .success(function(data) {
+                $scope.names = data;
+            });
+    }
+    $scope.upd = function(id, name, email, age) {
+        $scope.id = id;
+        $scope.name = name;
+        $scope.email = email;
+        $scope.age = age;
+        $scope.btnName = "Update";
+    }
+    
+});
+</script>  
+</body>  
+</html>  
